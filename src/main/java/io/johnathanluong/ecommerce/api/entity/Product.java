@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "products")
-public class Products {    
+public class Product {    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,18 +30,18 @@ public class Products {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(unique = true, length = 50)
+    @Column(unique = true, length = 10)
     private String sku;
 
     @Column(length = 255)
     private String brand;
 
 
-    public Products(){
+    public Product(){
 
     }
 
-    public Products(Long id, String name, String description, BigDecimal price, String category, Integer stock,
+    public Product(Long id, String name, String description, BigDecimal price, String category, Integer stock,
             LocalDateTime createdAt, String sku, String brand) {
         this.id = id;
         this.name = name;
@@ -56,6 +56,10 @@ public class Products {
 
     public Long getId(){
         return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
     }
 
     public String getName() {
