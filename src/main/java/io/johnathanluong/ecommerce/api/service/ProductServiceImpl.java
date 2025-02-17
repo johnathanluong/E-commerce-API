@@ -26,10 +26,13 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public boolean deleteProduct(Long id) {
         if(productMap.containsKey(id)){
             productMap.remove(id);
+            return true;
         }
+
+        return false;
     }
 
     @Override
