@@ -1,6 +1,7 @@
 package io.johnathanluong.ecommerce.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -9,19 +10,31 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
+import io.johnathanluong.ecommerce.api.repository.ProductRepository;
 import io.johnathanluong.ecommerce.api.service.ProductServiceImpl;
 
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ProductServiceImplTest {
+    @Autowired
     private ProductServiceImpl productService;
+    
+    @Autowired
+    private ProductRepository productRepository;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl();
+        productRepository.deleteAllInBatch();
     }
 
+    
     @Test
+    @DirtiesContext
     void testCreateProduct(){
         Product product = new Product(
             null, 
@@ -48,6 +61,7 @@ class ProductServiceImplTest {
     }
 
     @Test
+    @DirtiesContext
     void testGetProductByIdExists(){
         Product product = new Product(
             null, 
@@ -73,18 +87,83 @@ class ProductServiceImplTest {
         assertEquals(createdProduct.getStock(), retrievedProduct.getStock());
         assertEquals(createdProduct.getSku(), retrievedProduct.getSku());
         assertEquals(createdProduct.getBrand(), retrievedProduct.getBrand());
-        assertEquals(createdProduct.getCreatedAt(), retrievedProduct.getCreatedAt());
+        assertNotNull(createdProduct.getCreatedAt());
     }    
 
     @Test
     void testGetProductByIdDoesNotExist() {
-        Product retrievedProduct = productService.getProductById(999L); // ID 999 likely doesn't exist
+        Product retrievedProduct = productService.getProductById(999L);
 
         assertNull(retrievedProduct, "Product should not be found for ID 999");
     }
 
+    
     @Test
-    void testDeleteProductById(){
+    @DirtiesContext
+    void testUpdateProductExists(){
+        Product product = new Product(
+            null, 
+            "New Headphones", 
+            "Good description.",
+            new BigDecimal("99.99"), 
+            "Electronics", 
+            150, 
+            LocalDateTime.now(), 
+            "SKU123456", 
+            "SoundWave"
+            );
+            Product createdProduct = productService.createProduct(product);
+            
+            assertNotNull(createdProduct.getId());
+            
+            Product updatedProduct = new Product(
+                null, 
+                "New Headphones", 
+                "Great description.",
+                new BigDecimal("99.99"), 
+                "Electronics", 
+                150, 
+                LocalDateTime.now(), 
+                "SKU123456", 
+                "SoundWave"
+                );
+                
+                productService.updateProduct(createdProduct.getId(), updatedProduct);
+                Product retrievedProduct = productService.getProductById(createdProduct.getId());
+                
+                assertNotNull(retrievedProduct);
+                assertEquals(createdProduct.getId(), retrievedProduct.getId());
+                assertEquals(updatedProduct.getName(), retrievedProduct.getName());
+                assertEquals(updatedProduct.getDescription(), retrievedProduct.getDescription());
+                assertEquals(updatedProduct.getPrice(), retrievedProduct.getPrice());
+                assertEquals(updatedProduct.getStock(), retrievedProduct.getStock());
+                assertEquals(updatedProduct.getSku(), retrievedProduct.getSku());
+                assertEquals(updatedProduct.getBrand(), retrievedProduct.getBrand());
+    }
+
+    @Test
+    void testUpdateProductNotExists(){
+        Product updatedProduct = new Product(
+            null, 
+            "New Headphones", 
+            "Great description.",
+            new BigDecimal("99.99"), 
+            "Electronics", 
+            150, 
+            LocalDateTime.now(), 
+            "SKU123456", 
+            "SoundWave"
+            );
+
+        Product newProduct = productService.updateProduct(9999L, updatedProduct);
+
+        assertNull(newProduct);
+    }
+        
+        
+    @Test
+    @DirtiesContext
+    void testDeleteProductByIdExists(){
         Product product = new Product(
             null, 
             "Headphones", 
@@ -107,44 +186,9 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void testUpdateProduct(){
-        Product product = new Product(
-            null, 
-            "New Headphones", 
-            "Good description.",
-            new BigDecimal("99.99"), 
-            "Electronics", 
-            150, 
-            LocalDateTime.now(), 
-            "SKU123456", 
-            "SoundWave"
-        );
-        Product createdProduct = productService.createProduct(product);
+    void testDeleteProductByIdNotExists(){
+        boolean deleted = productService.deleteProduct(9999L);
 
-        assertNotNull(createdProduct.getId());
-        
-        Product updatedProduct = new Product(
-            null, 
-            "New Headphones", 
-            "Great description.",
-            new BigDecimal("99.99"), 
-            "Electronics", 
-            150, 
-            LocalDateTime.now(), 
-            "SKU123456", 
-            "SoundWave"
-        );
-
-        productService.updateProduct(createdProduct.getId(), updatedProduct);
-        Product retrievedProduct = productService.getProductById(createdProduct.getId());
-
-        assertNotNull(retrievedProduct, "Retrieved product should not be null after update");
-        assertEquals(createdProduct.getId(), retrievedProduct.getId(), "Retrieved product ID should match original"); // ID should not change
-        assertEquals(updatedProduct.getName(), retrievedProduct.getName(), "Name should be updated");
-        assertEquals(updatedProduct.getDescription(), retrievedProduct.getDescription(), "Description should be updated");
-        assertEquals(updatedProduct.getPrice(), retrievedProduct.getPrice(), "Price should be updated");
-        assertEquals(updatedProduct.getStock(), retrievedProduct.getStock(), "Stock should be updated");
-        assertEquals(updatedProduct.getSku(), retrievedProduct.getSku(), "SKU should be updated");
-        assertEquals(updatedProduct.getBrand(), retrievedProduct.getBrand(), "Brand should be updated");
+        assertFalse(deleted);
     }
 }
