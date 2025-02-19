@@ -2,6 +2,8 @@ package io.johnathanluong.ecommerce.api.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.*;
 
@@ -11,6 +13,9 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    Set<Review> reviews = new HashSet<>();
     
     @Column(nullable = false, length = 255)
     private String name;
@@ -52,6 +57,7 @@ public class Product {
         this.createdAt = createdAt;
         this.sku = sku;
         this.brand = brand;
+        this.reviews = new HashSet<>();
     }
 
     
@@ -187,5 +193,13 @@ public class Product {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public Set<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<Review> reviews) {
+        this.reviews = reviews;
     }    
 }
