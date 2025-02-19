@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.repository.ProductRepository;
@@ -20,6 +21,7 @@ import io.johnathanluong.ecommerce.api.service.ProductServiceImpl;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 class ProductServiceImplTest {
     @Autowired
     private ProductServiceImpl productService;
@@ -112,33 +114,33 @@ class ProductServiceImplTest {
             "SKU123456", 
             "SoundWave"
             );
-            Product createdProduct = productService.createProduct(product);
+        Product createdProduct = productService.createProduct(product);
+        
+        assertNotNull(createdProduct.getId());
+        
+        Product updatedProduct = new Product(
+            null, 
+            "New Headphones", 
+            "Great description.",
+            new BigDecimal("99.99"), 
+            "Electronics", 
+            150, 
+            LocalDateTime.now(), 
+            "SKU123456", 
+            "SoundWave"
+            );
             
-            assertNotNull(createdProduct.getId());
-            
-            Product updatedProduct = new Product(
-                null, 
-                "New Headphones", 
-                "Great description.",
-                new BigDecimal("99.99"), 
-                "Electronics", 
-                150, 
-                LocalDateTime.now(), 
-                "SKU123456", 
-                "SoundWave"
-                );
-                
-                productService.updateProduct(createdProduct.getId(), updatedProduct);
-                Product retrievedProduct = productService.getProductById(createdProduct.getId());
-                
-                assertNotNull(retrievedProduct);
-                assertEquals(createdProduct.getId(), retrievedProduct.getId());
-                assertEquals(updatedProduct.getName(), retrievedProduct.getName());
-                assertEquals(updatedProduct.getDescription(), retrievedProduct.getDescription());
-                assertEquals(updatedProduct.getPrice(), retrievedProduct.getPrice());
-                assertEquals(updatedProduct.getStock(), retrievedProduct.getStock());
-                assertEquals(updatedProduct.getSku(), retrievedProduct.getSku());
-                assertEquals(updatedProduct.getBrand(), retrievedProduct.getBrand());
+        productService.updateProduct(createdProduct.getId(), updatedProduct);
+        Product retrievedProduct = productService.getProductById(createdProduct.getId());
+        
+        assertNotNull(retrievedProduct);
+        assertEquals(createdProduct.getId(), retrievedProduct.getId());
+        assertEquals(updatedProduct.getName(), retrievedProduct.getName());
+        assertEquals(updatedProduct.getDescription(), retrievedProduct.getDescription());
+        assertEquals(updatedProduct.getPrice(), retrievedProduct.getPrice());
+        assertEquals(updatedProduct.getStock(), retrievedProduct.getStock());
+        assertEquals(updatedProduct.getSku(), retrievedProduct.getSku());
+        assertEquals(updatedProduct.getBrand(), retrievedProduct.getBrand());
     }
 
     @Test

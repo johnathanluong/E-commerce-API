@@ -1,10 +1,11 @@
 package io.johnathanluong.ecommerce.api.controller;
 
+import java.net.URI;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.service.ProductService;
@@ -22,8 +23,12 @@ public class ProductControllerImpl implements ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product){
         Product createdProduct = productService.createProduct(product);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(createdProduct.getId())
+            .toUri();
+            
+        return ResponseEntity.created(location).body(createdProduct);
     }
 
     @GetMapping("/{id}")

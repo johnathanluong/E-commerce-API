@@ -39,13 +39,20 @@ public class ProductServiceImpl implements ProductService{
         Optional<Product> product = productRepository.findById(id);
         if(product.isPresent()){
             Product existingProduct = product.get();
-            existingProduct.setName(updatedProduct.getName());
-            existingProduct.setDescription(updatedProduct.getDescription());
-            existingProduct.setCategory(updatedProduct.getCategory());
-            existingProduct.setPrice(updatedProduct.getPrice());
-            existingProduct.setStock(updatedProduct.getStock());
-            existingProduct.setSku(updatedProduct.getSku());
-            existingProduct.setBrand(updatedProduct.getBrand());
+            if(updatedProduct.getName() != null)
+                existingProduct.setName(updatedProduct.getName());
+            if(updatedProduct.getDescription() != null)
+                existingProduct.setDescription(updatedProduct.getDescription());
+            if(updatedProduct.getCategory() != null)
+                existingProduct.setCategory(updatedProduct.getCategory());
+            if(updatedProduct.getPrice() != null)
+                existingProduct.setPrice(updatedProduct.getPrice());
+            if(updatedProduct.getStock() != null)
+                existingProduct.setStock(updatedProduct.getStock());
+            if(updatedProduct.getSku() != null)
+                existingProduct.setSku(updatedProduct.getSku());
+            if(updatedProduct.getBrand() != null)
+                existingProduct.setBrand(updatedProduct.getBrand());
             return productRepository.save(existingProduct);
         }
         
