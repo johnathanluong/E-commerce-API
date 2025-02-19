@@ -47,14 +47,12 @@ public class Review {
         this.createdAt = LocalDateTime.now();
     }
 
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((product == null) ? 0 : product.hashCode());
-        result = prime * result + ((reviewText == null) ? 0 : reviewText.hashCode());
-        result = prime * result + ((sentiment == null) ? 0 : sentiment.hashCode());
-        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
 
@@ -67,28 +65,14 @@ public class Review {
         if (getClass() != obj.getClass())
             return false;
         Review other = (Review) obj;
-        if (product == null) {
-            if (other.product != null)
+        if (id == null) {
+            if (other.id != null)
                 return false;
-        } else if (!product.equals(other.product))
-            return false;
-        if (reviewText == null) {
-            if (other.reviewText != null)
-                return false;
-        } else if (!reviewText.equals(other.reviewText))
-            return false;
-        if (sentiment == null) {
-            if (other.sentiment != null)
-                return false;
-        } else if (!sentiment.equals(other.sentiment))
-            return false;
-        if (createdAt == null) {
-            if (other.createdAt != null)
-                return false;
-        } else if (!createdAt.equals(other.createdAt))
+        } else if (!id.equals(other.id))
             return false;
         return true;
     }
+    
 
     public Long getId() {
         return id;

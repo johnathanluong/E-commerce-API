@@ -35,18 +35,26 @@ public class ReviewControllerImpl implements ReviewController {
     @PostMapping("/products/{productId}/reviews")
     public ResponseEntity<Review> createReview(@PathVariable Long productId, @RequestBody Review review) {
         Product product = productService.getProductById(productId);
+        if(product == null){
+            return ResponseEntity.notFound().build();
+        }
         review.setProduct(product);
 
         Review createdReview = reviewService.createReview(review);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-            .path("/{id}")
+            .path("/api/reviews/{id}")
             .buildAndExpand(createdReview.getId())
             .toUri();
         return ResponseEntity.created(location).body(createdReview);
     }
 
     @GetMapping("/products/{productId}/reviews")
-    public ResponseEntity<List<Review>> getAllReviewsOfProduct(@PathVariable Long productId, Product product) {
+    public ResponseEntity<List<Review>> getAllReviewsOfProduct(@PathVariable Long productId) {
+        Product product = productService.getProductById(productId);
+        if(product == null){
+            return ResponseEntity.notFound().build();
+        }
+
         List<Review> reviews = reviewService.getAllReviewsOfProduct(product);
         return ResponseEntity.ok(reviews);
     }
@@ -54,6 +62,9 @@ public class ReviewControllerImpl implements ReviewController {
     @GetMapping("/reviews/{id}")
     public ResponseEntity<Review> getReviewById(@PathVariable Long id) {
         Review review = reviewService.getReviewById(id);
+        if(review == null){
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(review);
     }
 
