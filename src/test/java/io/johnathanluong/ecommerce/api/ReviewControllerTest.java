@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.johnathanluong.ecommerce.api.controller.ReviewControllerImpl;
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.entity.Review;
+import io.johnathanluong.ecommerce.api.entity.User;
 import io.johnathanluong.ecommerce.api.service.ProductService;
 import io.johnathanluong.ecommerce.api.service.ReviewService;
 
@@ -47,6 +48,7 @@ class ReviewControllerTest {
     void testCreateReview_ProductExists() throws Exception {
         Long productId = 123L;
         Product mockProduct = new Product();
+        User mockUser = new User();
         mockProduct.setId(productId);
 
         Review reviewToCreate = new Review();
@@ -60,7 +62,7 @@ class ReviewControllerTest {
         createdReview.setProduct(mockProduct);
 
         when(productService.getProductById(productId)).thenReturn(mockProduct);
-        when(reviewService.createReview(reviewToCreate)).thenReturn(createdReview);
+        when(reviewService.createReview(reviewToCreate, mockUser)).thenReturn(createdReview);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/products/{productId}/reviews", productId)
                                     .contentType(MediaType.APPLICATION_JSON)

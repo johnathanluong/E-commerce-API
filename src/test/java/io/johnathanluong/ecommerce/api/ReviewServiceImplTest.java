@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.entity.Review;
+import io.johnathanluong.ecommerce.api.entity.User;
 import io.johnathanluong.ecommerce.api.repository.ProductRepository;
 import io.johnathanluong.ecommerce.api.repository.ReviewRepository;
 import io.johnathanluong.ecommerce.api.service.ReviewServiceImpl;
@@ -37,6 +38,7 @@ class ReviewServiceImplTest {
     ReviewServiceImpl reviewService;
 
     Product product;
+    User user;
 
     @BeforeEach
     void setUp(){
@@ -54,15 +56,16 @@ class ReviewServiceImplTest {
             "SKU123456", 
             "SoundWave"
         );
+        user = new User();
         product = productRepository.save(product);
     }
 
     @Test
     @DirtiesContext
     void testCreateReview(){
-        Review review = new Review(null, product, "SAMPLE TEXT", "POSITIVE");
+        Review review = new Review(null, user, product, "SAMPLE TEXT", "POSITIVE");
 
-        Review createdReview = reviewService.createReview(review);
+        Review createdReview = reviewService.createReview(review, user);
 
         assertNotNull(createdReview);
         assertEquals(product, createdReview.getProduct());
@@ -75,8 +78,8 @@ class ReviewServiceImplTest {
     @Test
     @DirtiesContext
     void testGetReviewByIdExists(){
-        Review review = new Review(null, product, "SAMPLE TEXT", "POSITIVE");
-        Review createdReview = reviewService.createReview(review);
+        Review review = new Review(null, user, product, "SAMPLE TEXT", "POSITIVE");
+        Review createdReview = reviewService.createReview(review, user);
         
         Review foundReview = reviewService.getReviewById(createdReview.getId());
 
@@ -97,11 +100,11 @@ class ReviewServiceImplTest {
     @Test 
     @DirtiesContext
     void testGetAllReviewsByProductExists(){
-        Review review1 = new Review(null, product, "SAMPLE TEXT1", "POSITIVE");
-        Review review2 = new Review(null, product, "SAMPLE TEXT2", "NEGATIVE");
+        Review review1 = new Review(null, user, product, "SAMPLE TEXT1", "POSITIVE");
+        Review review2 = new Review(null, user, product, "SAMPLE TEXT2", "NEGATIVE");
         
-        reviewService.createReview(review1);
-        reviewService.createReview(review2);
+        reviewService.createReview(review1, user);
+        reviewService.createReview(review2, user);
 
         List<Review> reviews = reviewService.getAllReviewsOfProduct(product); 
 
@@ -122,10 +125,10 @@ class ReviewServiceImplTest {
     @Test
     @DirtiesContext
     void testUpdateReviewExists(){
-        Review review1 = new Review(null, product, "SAMPLE TEXT1", "POSITIVE");
-        Review createdReview = reviewService.createReview(review1);
+        Review review1 = new Review(null, user, product, "SAMPLE TEXT1", "POSITIVE");
+        Review createdReview = reviewService.createReview(review1, user);
 
-        Review review2 = new Review(null, product, "SAMPLE TEXT2", "NEGATIVE");
+        Review review2 = new Review(null, user, product, "SAMPLE TEXT2", "NEGATIVE");
 
         reviewService.updateReview(createdReview.getId(), review2);
         Review retrievedReview = reviewService.getReviewById(createdReview.getId());
@@ -139,7 +142,7 @@ class ReviewServiceImplTest {
 
     @Test
     void testUpdateReviewNotExists(){
-        Review review = new Review(null, product, "SAMPLE TEXT1", "POSITIVE");
+        Review review = new Review(null, user, product, "SAMPLE TEXT1", "POSITIVE");
         Review updatedReview = reviewService.updateReview(1234L, review);
         assertNull(updatedReview);
     }
@@ -147,8 +150,8 @@ class ReviewServiceImplTest {
     @Test
     @DirtiesContext
     void testDeleteReviewExists(){
-        Review review = new Review(null, product, "SAMPLE TEXT1", "POSITIVE");
-        Review createdReview = reviewService.createReview(review);
+        Review review = new Review(null, user, product, "SAMPLE TEXT1", "POSITIVE");
+        Review createdReview = reviewService.createReview(review, user);
         Long reviewID = createdReview.getId();
 
         assertNotNull(createdReview);

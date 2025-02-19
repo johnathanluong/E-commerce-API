@@ -10,6 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.entity.Review;
+import io.johnathanluong.ecommerce.api.entity.User;
 import io.johnathanluong.ecommerce.api.service.ProductService;
 import io.johnathanluong.ecommerce.api.service.ReviewService;
 
@@ -35,12 +36,13 @@ public class ReviewControllerImpl implements ReviewController {
     @PostMapping("/products/{productId}/reviews")
     public ResponseEntity<Review> createReview(@PathVariable Long productId, @RequestBody Review review) {
         Product product = productService.getProductById(productId);
+        User user = new User();
         if(product == null){
             return ResponseEntity.notFound().build();
         }
         review.setProduct(product);
 
-        Review createdReview = reviewService.createReview(review);
+        Review createdReview = reviewService.createReview(review, user);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/api/reviews/{id}")
             .buildAndExpand(createdReview.getId())

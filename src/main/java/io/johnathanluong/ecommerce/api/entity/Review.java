@@ -26,10 +26,9 @@ public class Review {
     @JsonBackReference
     private Product product;
 
-    // user whenever i finish it
-    // @ManyToOne(fetch = FetchType.Lazy)
-    // @JoinColumn(name = "user_id", nullable = false)
-    // private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String reviewText; 
@@ -42,12 +41,12 @@ public class Review {
 
     public Review(){}
 
-    public Review(Long id, Product product, String reviewText, String sentiment) {
+    public Review(Long id, User user, Product product, String reviewText, String sentiment) {
         this.id = id;
+        this.user = user;
         this.product = product;
         this.reviewText = reviewText;
         this.sentiment = sentiment;
-        this.createdAt = LocalDateTime.now();
     }
 
 
@@ -83,6 +82,14 @@ public class Review {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Product getProduct() {

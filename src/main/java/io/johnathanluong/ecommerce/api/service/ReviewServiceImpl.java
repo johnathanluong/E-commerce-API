@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.entity.Review;
+import io.johnathanluong.ecommerce.api.entity.User;
 import io.johnathanluong.ecommerce.api.repository.ReviewRepository;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.comprehend.ComprehendClient;
@@ -26,8 +27,9 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public Review createReview(Review review) {
+    public Review createReview(Review review, User user) {
         review.setCreatedAt(LocalDateTime.now());
+        review.setUser(user);
 
         DetectSentimentRequest detectSentimentRequest = DetectSentimentRequest.builder()
             .text(review.getReviewText())
