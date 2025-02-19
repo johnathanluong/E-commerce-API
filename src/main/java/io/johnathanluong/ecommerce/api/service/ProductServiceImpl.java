@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.repository.ProductRepository;
-
 @Service
 public class ProductServiceImpl implements ProductService{
-    private final ProductRepository productRepository;    
+    private final ProductRepository productRepository;
     
     public ProductServiceImpl(ProductRepository productRepository){
         this.productRepository = productRepository;

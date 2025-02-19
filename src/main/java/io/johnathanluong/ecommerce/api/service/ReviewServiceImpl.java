@@ -9,18 +9,35 @@ import org.springframework.stereotype.Service;
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.entity.Review;
 import io.johnathanluong.ecommerce.api.repository.ReviewRepository;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.comprehend.ComprehendClient;
+import software.amazon.awssdk.services.comprehend.model.DetectSentimentRequest;
+import software.amazon.awssdk.services.comprehend.model.DetectSentimentResponse;
+import software.amazon.awssdk.services.comprehend.model.SentimentType;
 
 @Service
 public class ReviewServiceImpl implements ReviewService{
     private final ReviewRepository reviewRepository;
+    private final ComprehendClient comprehendClient;
 
     public ReviewServiceImpl(ReviewRepository reviewRepository){
         this.reviewRepository = reviewRepository;
+        this.comprehendClient = ComprehendClient.builder().region(Region.US_EAST_1).build();
     }
 
     @Override
     public Review createReview(Review review) {
         review.setCreatedAt(LocalDateTime.now());
+
+        DetectSentimentRequest detectSentimentRequest = DetectSentimentRequest.builder()
+            .text(review.getReviewText())
+            .languageCode("en")
+            .build();
+        
+        DetectSentimentResponse detectSentimentResponse = comprehendClient.detectSentiment(detectSentimentRequest);
+        SentimentType sentimentType = detectSentimentResponse.sentiment();
+        review.setSentiment(sentimentType.toString());
+        
         return reviewRepository.save(review);
     }
 
