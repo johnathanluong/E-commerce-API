@@ -1,10 +1,8 @@
 package io.johnathanluong.ecommerce.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -130,7 +128,7 @@ class ReviewServiceImplTest {
 
         Review review2 = new Review(null, user, product, "SAMPLE TEXT2", "NEGATIVE");
 
-        reviewService.updateReview(createdReview.getId(), review2);
+        reviewService.updateReview(createdReview.getId(), review2, user);
         Review retrievedReview = reviewService.getReviewById(createdReview.getId());
 
         assertNotNull(retrievedReview);
@@ -143,7 +141,7 @@ class ReviewServiceImplTest {
     @Test
     void testUpdateReviewNotExists(){
         Review review = new Review(null, user, product, "SAMPLE TEXT1", "POSITIVE");
-        Review updatedReview = reviewService.updateReview(1234L, review);
+        Review updatedReview = reviewService.updateReview(1234L, review, user);
         assertNull(updatedReview);
     }
 
@@ -156,16 +154,14 @@ class ReviewServiceImplTest {
 
         assertNotNull(createdReview);
 
-        boolean deleted = reviewService.deleteReview(reviewID);
+        reviewService.deleteReview(reviewID, user);
         
-        assertTrue(deleted);
         assertNull(reviewService.getReviewById(reviewID));
     }
 
     @Test
     void testDeleteReviewNotExists(){
-        boolean deleted = reviewService.deleteReview(1234L);
-        assertFalse(deleted);
+        reviewService.deleteReview(1234L, user);
         assertNull(reviewService.getReviewById(1234L));
     }
 }

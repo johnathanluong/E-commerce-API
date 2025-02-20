@@ -11,6 +11,6 @@ public interface ReviewService {
     Review createReview(Review review, User user);
     Review getReviewById(Long id);
     List<Review> getAllReviewsOfProduct(Product product);
-    Review updateReview(Long id, Review updatedReview);
-    boolean deleteReview(Long id);
+    Review updateReview(Long id, Review updatedReview, User user);
+    void deleteReview(Long id, User user);
 }

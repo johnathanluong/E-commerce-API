@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import io.johnathanluong.ecommerce.api.entity.Product;
 import io.johnathanluong.ecommerce.api.entity.Review;
 import io.johnathanluong.ecommerce.api.entity.User;
+import io.johnathanluong.ecommerce.api.exception.AuthorizationException;
 import io.johnathanluong.ecommerce.api.repository.ReviewRepository;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.comprehend.ComprehendClient;
@@ -59,29 +60,46 @@ public class ReviewServiceImpl implements ReviewService{
     }
     
     @Override
-    public Review updateReview(Long id, Review updatedReview) {
-        Optional<Review> review = reviewRepository.findById(id);
-        if(review.isPresent()){
-            Review existingReview = review.get();
-            if(updatedReview.getReviewText() != null)
-                existingReview.setReviewText(updatedReview.getReviewText());
-            if(updatedReview.getProduct() != null)
-                existingReview.setProduct(updatedReview.getProduct());
-            if(updatedReview.getSentiment() != null)
-                existingReview.setSentiment(updatedReview.getSentiment());
-            return reviewRepository.save(existingReview);
+    public Review updateReview(Long id, Review updatedReview, User currentUser) {
+        Review existingReview = reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Review not found with id: " + id));
+
+        if (!isReviewOwner(existingReview, currentUser)) {
+            throw new AuthorizationException("You are not authorized to edit this review.");
         }
-        return null;
+
+        if(updatedReview.getReviewText() != null)
+            existingReview.setReviewText(updatedReview.getReviewText());
+
+        if (updatedReview.getReviewText() != null) {
+            DetectSentimentRequest detectSentimentRequest = DetectSentimentRequest.builder()
+                    .text(existingReview.getReviewText())
+                    .languageCode("en")
+                    .build();
+            DetectSentimentResponse detectSentimentResponse = comprehendClient.detectSentiment(detectSentimentRequest);
+            SentimentType sentimentType = detectSentimentResponse.sentiment();
+            existingReview.setSentiment(sentimentType.toString());
+        } else if (updatedReview.getSentiment() != null) {
+            existingReview.setSentiment(updatedReview.getSentiment());
+        }
+
+
+        return reviewRepository.save(existingReview);
     }
     
     @Override
-    public boolean deleteReview(Long id) {
-        if(reviewRepository.existsById(id)){
-            reviewRepository.deleteById(id);
-            return true;
+    public void deleteReview(Long id, User user) {
+        Review review = reviewRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Review not found with id: " + id));
+        
+        if(!isReviewOwner(review, user)){
+            throw new AuthorizationException("You are not authorized to delete this review.");
         }
-
-        return false;
+        
+        reviewRepository.delete(review);
     }
     
+    private boolean isReviewOwner(Review review, User user) {
+        return review.getUser().getId().equals(user.getId());
+    }
 }

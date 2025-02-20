@@ -212,7 +212,7 @@ class UserServiceImplUnitTest {
         Mockito.verifyNoInteractions(passwordEncoder);
     }
 
-     @Test
+    @Test
     void updateUser_ValidationFails() {
         User existingUser = new User("oldUser", "oldPass", "old@email.com");
         existingUser.setId(testUser.getId());
